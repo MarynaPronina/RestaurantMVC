@@ -1,7 +1,16 @@
+using RestaurantInfrastructure;
+using Microsoft.EntityFrameworkCore;
+using RestaurantDomain.Model;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<RestaurantContext>(option => option.UseSqlServer(
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
+
 
 var app = builder.Build();
 
@@ -22,7 +31,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Categories}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 
