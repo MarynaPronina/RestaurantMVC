@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RestaurantDomain.Model;
@@ -18,47 +14,28 @@ namespace RestaurantInfrastructure.Controllers
             _context = context;
         }
 
-        // GET: DishCategories
         public async Task<IActionResult> Index()
         {
-            var restaurantContext = _context.DishCategories.Include(d => d.Category).Include(d => d.Dish);
-            return View(await restaurantContext.ToListAsync());
+            var data = await _context.DishCategories.Include(dc => dc.Dish).Include(dc => dc.Category).ToListAsync();
+            return View(data);
         }
 
-        // GET: DishCategories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var dishCategory = await _context.DishCategories
-                .Include(d => d.Category)
-                .Include(d => d.Dish)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (dishCategory == null)
-            {
-                return NotFound();
-            }
-
-            return View(dishCategory);
+            if (id == null) return NotFound();
+            var item = await _context.DishCategories.Include(dc => dc.Dish).Include(dc => dc.Category).FirstOrDefaultAsync(dc => dc.Id == id);
+            return item == null ? NotFound() : View(item);
         }
 
-        // GET: DishCategories/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             ViewData["DishId"] = new SelectList(_context.Dishes, "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
-        // POST: DishCategories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CategoryId,DishId")] DishCategory dishCategory)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(DishCategory dishCategory)
         {
             if (ModelState.IsValid)
             {
@@ -66,87 +43,43 @@ namespace RestaurantInfrastructure.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", dishCategory.CategoryId);
             ViewData["DishId"] = new SelectList(_context.Dishes, "Id", "Name", dishCategory.DishId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", dishCategory.CategoryId);
             return View(dishCategory);
         }
 
-        // GET: DishCategories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
             var dishCategory = await _context.DishCategories.FindAsync(id);
-            if (dishCategory == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", dishCategory.CategoryId);
+            if (dishCategory == null) return NotFound();
             ViewData["DishId"] = new SelectList(_context.Dishes, "Id", "Name", dishCategory.DishId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", dishCategory.CategoryId);
             return View(dishCategory);
         }
 
-        // POST: DishCategories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryId,DishId")] DishCategory dishCategory)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, DishCategory dishCategory)
         {
-            if (id != dishCategory.Id)
-            {
-                return NotFound();
-            }
-
+            if (id != dishCategory.Id) return NotFound();
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(dishCategory);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DishCategoryExists(dishCategory.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _context.Update(dishCategory);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", dishCategory.CategoryId);
             ViewData["DishId"] = new SelectList(_context.Dishes, "Id", "Name", dishCategory.DishId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", dishCategory.CategoryId);
             return View(dishCategory);
         }
 
-        // GET: DishCategories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var dishCategory = await _context.DishCategories
-                .Include(d => d.Category)
-                .Include(d => d.Dish)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (dishCategory == null)
-            {
-                return NotFound();
-            }
-
-            return View(dishCategory);
+            if (id == null) return NotFound();
+            var dishCategory = await _context.DishCategories.Include(dc => dc.Dish).Include(dc => dc.Category).FirstOrDefaultAsync(dc => dc.Id == id);
+            return dishCategory == null ? NotFound() : View(dishCategory);
         }
 
-        // POST: DishCategories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -155,15 +88,9 @@ namespace RestaurantInfrastructure.Controllers
             if (dishCategory != null)
             {
                 _context.DishCategories.Remove(dishCategory);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool DishCategoryExists(int id)
-        {
-            return _context.DishCategories.Any(e => e.Id == id);
         }
     }
 }
