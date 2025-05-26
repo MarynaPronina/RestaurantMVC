@@ -1,24 +1,15 @@
 ﻿@model RestaurantDomain.Model.Table
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Table Details";
 }
-
-<h1>Details</h1>
-
-<div>
-    <h4>Table</h4>
-    <hr />
+<div class="menu-header">
+    <h2>🔎 Table Details</h2>
+</div>
+<div class="card bg-white p-4">
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Number)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Number)
-        </dd>
+        <dt class="col-sm-3">Number</dt>
+        <dd class="col-sm-9">@Model.Number</dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back</a>

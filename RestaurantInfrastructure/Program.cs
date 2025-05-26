@@ -1,38 +1,36 @@
-using RestaurantInfrastructure;
 using Microsoft.EntityFrameworkCore;
 using RestaurantDomain.Model;
+using RestaurantInfrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ?? 1. Add MVC and Razor support
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<RestaurantContext>(option => option.UseSqlServer(
-    builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
-
+// ?? 2. Add EF Core DbContext
+builder.Services.AddDbContext<RestaurantContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ?? 3. Configure middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseHsts(); // For HTTPS Strict Transport Security
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
+app.UseStaticFiles(); // To serve wwwroot and static files (e.g., CSS/JS/images)
 
+app.UseRouting();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
+// ?? 4. Setup default routing
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Categories}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 app.Run();

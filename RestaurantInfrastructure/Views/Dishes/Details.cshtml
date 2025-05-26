@@ -1,36 +1,26 @@
 ﻿@model RestaurantDomain.Model.Dish
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі страви";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">📄 Деталі страви</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Назва:</dt>
+                <dd class="col-sm-8">@Model.Name</dd>
 
-<div>
-    <h4>Dish</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                <dt class="col-sm-4">Ціна:</dt>
+                <dd class="col-sm-8">@Model.Price грн</dd>
+            </dl>
+        </div>
+        <div class="card-footer text-end">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Редагувати</a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">⬅ Назад</a>
+        </div>
+    </div>
 </div>

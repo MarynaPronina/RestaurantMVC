@@ -1,36 +1,21 @@
 ﻿@model RestaurantDomain.Model.Client
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі клієнта";
 }
 
-<h1>Details</h1>
+<div class="container py-5">
+    <h2 class="text-center mb-4">Деталі клієнта</h2>
 
-<div>
-    <h4>Client</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="card mx-auto shadow-sm" style="max-width: 600px;">
+        <div class="card-body">
+            <p><strong>Ім’я:</strong> @Model.FirstName</p>
+            <p><strong>Прізвище:</strong> @Model.LastName</p>
+            <p><strong>Телефон:</strong> @Model.PhoneNumber</p>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редагувати</a>
+                <a asp-action="Index" class="btn btn-secondary">Назад</a>
+            </div>
+        </div>
+    </div>
 </div>

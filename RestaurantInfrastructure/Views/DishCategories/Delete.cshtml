@@ -1,33 +1,30 @@
 ﻿@model RestaurantDomain.Model.DishCategory
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Видалити звʼязок";
 }
 
-<h1>Delete</h1>
+<div class="container mt-5">
+    <div class="card shadow border-danger">
+        <div class="card-header bg-danger text-white text-center">
+            <h4>❌ Видалити звʼязок між стравою та категорією?</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Страва:</dt>
+                <dd class="col-sm-8">@Model.Dish?.Name ?? "—"</dd>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>DishCategory</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Dish)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Dish.Name)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+                <dt class="col-sm-4">Категорія:</dt>
+                <dd class="col-sm-8">@Model.Category?.Name ?? "—"</dd>
+            </dl>
+
+            <form asp-action="DeleteConfirmed">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger">Так, видалити</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">⬅ Скасувати</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

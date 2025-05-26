@@ -1,49 +1,41 @@
-﻿@model RestaurantDomain.Model.Order
-
+﻿@* Edit.cshtml *@
+@model RestaurantDomain.Model.Order
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Редагувати замовлення";
 }
 
-<h1>Edit</h1>
+<div class="container py-5">
+    <h2 class="text-center mb-4 fw-bold">Редагувати замовлення</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
 
-<h4>Order</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="ClientId" class="control-label"></label>
-                <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId"></select>
-                <span asp-validation-for="ClientId" class="text-danger"></span>
+                        <div class="mb-3">
+                            <label asp-for="ClientId" class="form-label">Клієнт</label>
+                            <select asp-for="ClientId" class="form-select" asp-items="ViewBag.Clients"></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TableId" class="form-label">Стіл</label>
+                            <select asp-for="TableId" class="form-select" asp-items="ViewBag.Tables"></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateTime" class="form-label">Дата і час</label>
+                            <input asp-for="DateTime" class="form-control" type="datetime-local" />
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
+                            <button type="submit" class="btn btn-primary">Зберегти</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="TableId" class="control-label"></label>
-                <select asp-for="TableId" class="form-control" asp-items="ViewBag.TableId"></select>
-                <span asp-validation-for="TableId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateTime" class="control-label"></label>
-                <input asp-for="DateTime" class="form-control" />
-                <span asp-validation-for="DateTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Sum" class="control-label"></label>
-                <input asp-for="Sum" class="form-control" />
-                <span asp-validation-for="Sum" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
