@@ -15,24 +15,35 @@ namespace RestaurantInfrastructure.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var dishes = await _context.Dishes.Include(d => d.DishCategories).ThenInclude(dc => dc.Category).ToListAsync();
+            var dishes = await _context.Dishes
+                .Include(d => d.DishCategories)
+                .ThenInclude(dc => dc.Category)
+                .ToListAsync();
+
             return View(dishes);
         }
 
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var dish = await _context.Dishes.Include(d => d.DishCategories).ThenInclude(dc => dc.Category).FirstOrDefaultAsync(d => d.Id == id);
+
+            var dish = await _context.Dishes
+                .Include(d => d.DishCategories)
+                .ThenInclude(dc => dc.Category)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
             return dish == null ? NotFound() : View(dish);
         }
 
         public IActionResult Create() => View();
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Dish dish)
         {
             if (ModelState.IsValid)
             {
+                dish.Id = GenerateNewDishId(); // 🆕
                 _context.Add(dish);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -47,10 +58,12 @@ namespace RestaurantInfrastructure.Controllers
             return dish == null ? NotFound() : View(dish);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Dish dish)
         {
             if (id != dish.Id) return NotFound();
+
             if (ModelState.IsValid)
             {
                 _context.Update(dish);
@@ -78,6 +91,14 @@ namespace RestaurantInfrastructure.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // 🆕 Генерація нового ID
+        private int GenerateNewDishId()
+        {
+            if (!_context.Dishes.Any())
+                return 1;
+            return _context.Dishes.Max(d => d.Id) + 1;
         }
     }
 }

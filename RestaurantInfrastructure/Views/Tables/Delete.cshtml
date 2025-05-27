@@ -1,18 +1,27 @@
 ﻿@model RestaurantDomain.Model.Table
 @{
-    ViewData["Title"] = "Delete Table";
+    ViewData["Title"] = "Видалити стіл";
 }
-<div class="menu-header">
-    <h2>❌ Confirm Table Deletion</h2>
+
+<div class="container py-5">
+    <h2 class="text-center mb-4 text-danger">❌ Підтвердити видалення столу</h2>
+
+    <div class="card bg-white shadow-sm mx-auto" style="max-width: 600px;">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Номер столу</dt>
+                <dd class="col-sm-8">@Model.Number</dd>
+            </dl>
+
+            <form asp-action="DeleteConfirmed" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-secondary">⬅ Назад</a>
+                    <button type="submit" class="btn btn-danger">Так, видалити</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-<div class="card bg-white p-4">
-    <dl class="row">
-        <dt class="col-sm-3">Number</dt>
-        <dd class="col-sm-9">@Model.Number</dd>
-    </dl>
-</div>
-<form asp-action="Delete">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>

@@ -32,6 +32,7 @@ namespace RestaurantInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
+                client.Id = GenerateNewClientId();
                 _context.Add(client);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -132,6 +133,7 @@ namespace RestaurantInfrastructure.Controllers
                 return BadRequest(string.Join("; ", errors));
             }
 
+            client.Id = GenerateNewClientId();
             _context.Clients.Add(client);
             await _context.SaveChangesAsync();
 
@@ -141,6 +143,17 @@ namespace RestaurantInfrastructure.Controllers
                 firstName = client.FirstName,
                 lastName = client.LastName
             });
+        }
+
+        // --------------------------
+        // Генерація нового Id вручну
+        // --------------------------
+        private int GenerateNewClientId()
+        {
+            if (!_context.Clients.Any())
+                return 1;
+
+            return _context.Clients.Max(c => c.Id) + 1;
         }
     }
 }

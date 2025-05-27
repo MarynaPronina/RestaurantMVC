@@ -12,7 +12,8 @@
                     <h4>➕ Призначити категорію страві</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create">
+                    <form asp-action="Create" method="post" novalidate>
+
                         <div class="mb-3">
                             <label asp-for="DishId" class="form-label">Страва</label>
                             <select asp-for="DishId" asp-items="ViewBag.Dishes" class="form-select"></select>

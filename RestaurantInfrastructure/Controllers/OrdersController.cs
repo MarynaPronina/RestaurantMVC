@@ -23,13 +23,21 @@ namespace RestaurantInfrastructure.Controllers
             return View(orders);
         }
 
+        // GET: Orders/Create
         public IActionResult Create()
         {
             ViewBag.Clients = new SelectList(_context.Clients, "Id", "LastName");
             ViewBag.Tables = new SelectList(_context.Tables, "Id", "Number");
-            return View();
+
+            var order = new Order
+            {
+                DateTime = DateTime.Now
+            };
+
+            return View(order);
         }
 
+        // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ClientId,TableId,DateTime")] Order order)
@@ -41,12 +49,14 @@ namespace RestaurantInfrastructure.Controllers
                 return View(order);
             }
 
+            order.Id = GenerateNewOrderId();
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -61,6 +71,7 @@ namespace RestaurantInfrastructure.Controllers
             return View(order);
         }
 
+        // POST: Orders/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ClientId,TableId,DateTime")] Order order)
@@ -91,6 +102,7 @@ namespace RestaurantInfrastructure.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -108,6 +120,7 @@ namespace RestaurantInfrastructure.Controllers
             return View(order);
         }
 
+        // GET: Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,6 +137,7 @@ namespace RestaurantInfrastructure.Controllers
             return View(order);
         }
 
+        // POST: Orders/Delete/5
         [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -135,6 +149,15 @@ namespace RestaurantInfrastructure.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // ---------- 🆕 Метод генерації нового ID ----------
+        private int GenerateNewOrderId()
+        {
+            if (!_context.Orders.Any())
+                return 1;
+
+            return _context.Orders.Max(o => o.Id) + 1;
         }
     }
 }

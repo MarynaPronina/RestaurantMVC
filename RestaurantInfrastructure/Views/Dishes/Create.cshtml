@@ -12,7 +12,7 @@
                     <h4><i class="bi bi-plus-circle me-2"></i> Додавання нової страви</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create">
+                    <form asp-action="Create" method="post" novalidate>
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label">Назва страви</label>
                             <input asp-for="Name" class="form-control" />
