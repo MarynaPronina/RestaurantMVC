@@ -16,23 +16,16 @@ public partial class RestaurantContext : DbContext
     }
 
     public virtual DbSet<Category> Categories { get; set; }
-
     public virtual DbSet<Client> Clients { get; set; }
-
     public virtual DbSet<Dish> Dishes { get; set; }
-
     public virtual DbSet<DishCategory> DishCategories { get; set; }
-
     public virtual DbSet<DishOrder> DishOrders { get; set; }
-
     public virtual DbSet<Order> Orders { get; set; }
-
     public virtual DbSet<Table> Tables { get; set; }
-
     public virtual DbSet<Worker> Workers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code.
         => optionsBuilder.UseSqlServer("Server=Victus\\SQLEXPRESS; Database=restaurant;Trusted_Connection=True; TrustServerCertificate=True; ");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -67,9 +60,7 @@ public partial class RestaurantContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
-            entity.Property(e => e.Category)
-                .HasMaxLength(200)
-                .IsUnicode(false);
+
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
                 .IsUnicode(false);
@@ -102,6 +93,9 @@ public partial class RestaurantContext : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
+
+            entity.Property(e => e.Quantity)
+                .IsRequired(); // 🔧 Обовʼязкове поле — якщо воно є в моделі
 
             entity.HasOne(d => d.Dish).WithMany(p => p.DishOrders)
                 .HasForeignKey(d => d.DishId)
@@ -137,9 +131,13 @@ public partial class RestaurantContext : DbContext
 
         modelBuilder.Entity<Table>(entity =>
         {
+            entity.ToTable("Tables");
+
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
+
+            entity.Property(e => e.Number);
         });
 
         modelBuilder.Entity<Worker>(entity =>

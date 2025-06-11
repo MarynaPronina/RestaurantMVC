@@ -11,7 +11,6 @@ public partial class Dish : Entity
 
     public decimal? Price { get; set; }
 
-    public string? Category { get; set; }
 
     public virtual ICollection<DishCategory> DishCategories { get; set; } = new List<DishCategory>();
 

@@ -8,12 +8,9 @@ namespace RestaurantInfrastructure.Controllers
     public class OrdersController : Controller
     {
         private readonly RestaurantContext _context;
+        public OrdersController(RestaurantContext context) => _context = context;
 
-        public OrdersController(RestaurantContext context)
-        {
-            _context = context;
-        }
-
+        
         public async Task<IActionResult> Index()
         {
             var orders = await _context.Orders
@@ -23,61 +20,93 @@ namespace RestaurantInfrastructure.Controllers
             return View(orders);
         }
 
-        // GET: Orders/Create
+        
         public IActionResult Create()
         {
             ViewBag.Clients = new SelectList(_context.Clients, "Id", "LastName");
             ViewBag.Tables = new SelectList(_context.Tables, "Id", "Number");
-
-            var order = new Order
-            {
-                DateTime = DateTime.Now
-            };
-
-            return View(order);
+           
+            ViewBag.Dishes = _context.Dishes
+                               .Select(d => new { d.Id, d.Name, d.Price })
+                               .ToList();
+            return View(new Order { DateTime = DateTime.Now });
         }
 
-        // POST: Orders/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,TableId,DateTime")] Order order)
+        
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(
+            Order order,
+            int[] DishIds,      
+            int[] Quantities)   
         {
             if (!ModelState.IsValid)
             {
+                
                 ViewBag.Clients = new SelectList(_context.Clients, "Id", "LastName", order.ClientId);
                 ViewBag.Tables = new SelectList(_context.Tables, "Id", "Number", order.TableId);
+                ViewBag.Dishes = _context.Dishes.Select(d => new { d.Id, d.Name, d.Price }).ToList();
                 return View(order);
             }
 
+            
             order.Id = GenerateNewOrderId();
+
+            
+            for (int i = 0; i < DishIds.Length; i++)
+            {
+                if (Quantities[i] <= 0) continue;
+                var dish = await _context.Dishes.FindAsync(DishIds[i]);
+                if (dish == null) continue;
+
+                order.DishOrders.Add(new DishOrder
+                {
+                    DishId = dish.Id,
+                    Quantity = Quantities[i],
+                    Dish = dish           
+                });
+            }
+
+           
+            order.Sum = order.DishOrders
+                .Sum(d => (d.Dish.Price ?? 0) * d.Quantity);
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Orders/Edit/5
+        
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var order = await _context.Orders
+                .Include(o => o.Client)
+                .Include(o => o.Table)
+                .Include(o => o.DishOrders).ThenInclude(d => d.Dish)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            return order == null ? NotFound() : View(order);
+        }
+
+        
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-                return NotFound();
-
+            if (id == null) return NotFound();
             var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-                return NotFound();
+            if (order == null) return NotFound();
 
             ViewBag.Clients = new SelectList(_context.Clients, "Id", "LastName", order.ClientId);
             ViewBag.Tables = new SelectList(_context.Tables, "Id", "Number", order.TableId);
             return View(order);
         }
 
-        // POST: Orders/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ClientId,TableId,DateTime")] Order order)
+        
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Order order)
         {
-            if (id != order.Id)
-                return NotFound();
+            if (id != order.Id) return NotFound();
 
             if (!ModelState.IsValid)
             {
@@ -86,60 +115,25 @@ namespace RestaurantInfrastructure.Controllers
                 return View(order);
             }
 
-            try
-            {
-                _context.Update(order);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Orders.Any(e => e.Id == id))
-                    return NotFound();
-                else
-                    throw;
-            }
-
+            _context.Update(order);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Orders/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var order = await _context.Orders
-                .Include(o => o.Client)
-                .Include(o => o.Table)
-                .Include(o => o.DishOrders).ThenInclude(d => d.Dish)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (order == null)
-                return NotFound();
-
-            return View(order);
-        }
-
-        // GET: Orders/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
             var order = await _context.Orders
                 .Include(o => o.Client)
                 .Include(o => o.Table)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(o => o.Id == id);
 
-            if (order == null)
-                return NotFound();
-
-            return View(order);
+            return order == null ? NotFound() : View(order);
         }
 
-        // POST: Orders/Delete/5
-        [HttpPost, ActionName("DeleteConfirmed")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("DeleteConfirmed"), ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var order = await _context.Orders.FindAsync(id);
@@ -151,13 +145,8 @@ namespace RestaurantInfrastructure.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ---------- 🆕 Метод генерації нового ID ----------
-        private int GenerateNewOrderId()
-        {
-            if (!_context.Orders.Any())
-                return 1;
-
-            return _context.Orders.Max(o => o.Id) + 1;
-        }
+        
+        private int GenerateNewOrderId() =>
+            _context.Orders.Any() ? _context.Orders.Max(o => o.Id) + 1 : 1;
     }
 }

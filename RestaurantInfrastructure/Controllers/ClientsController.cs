@@ -18,6 +18,17 @@ namespace RestaurantInfrastructure.Controllers
         {
             return View(await _context.Clients.ToListAsync());
         }
+        // GET: Clients/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var client = await _context.Clients
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            return client == null ? NotFound() : View(client);
+        }
+
 
         // GET: Clients/Create
         public IActionResult Create()
