@@ -10,7 +10,7 @@ namespace RestaurantInfrastructure.Controllers
         private readonly RestaurantContext _context;
         public OrdersController(RestaurantContext context) => _context = context;
 
-        
+
         public async Task<IActionResult> Index()
         {
             var orders = await _context.Orders
@@ -20,38 +20,38 @@ namespace RestaurantInfrastructure.Controllers
             return View(orders);
         }
 
-        
+
         public IActionResult Create()
         {
             ViewBag.Clients = new SelectList(_context.Clients, "Id", "LastName");
             ViewBag.Tables = new SelectList(_context.Tables, "Id", "Number");
-           
+
             ViewBag.Dishes = _context.Dishes
                                .Select(d => new { d.Id, d.Name, d.Price })
                                .ToList();
             return View(new Order { DateTime = DateTime.Now });
         }
 
-        
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             Order order,
-            int[] DishIds,      
-            int[] Quantities)   
+            int[] DishIds,
+            int[] Quantities)
         {
             if (!ModelState.IsValid)
             {
-                
+
                 ViewBag.Clients = new SelectList(_context.Clients, "Id", "LastName", order.ClientId);
                 ViewBag.Tables = new SelectList(_context.Tables, "Id", "Number", order.TableId);
                 ViewBag.Dishes = _context.Dishes.Select(d => new { d.Id, d.Name, d.Price }).ToList();
                 return View(order);
             }
 
-            
+
             order.Id = GenerateNewOrderId();
 
-            
+
             for (int i = 0; i < DishIds.Length; i++)
             {
                 if (Quantities[i] <= 0) continue;
@@ -62,11 +62,11 @@ namespace RestaurantInfrastructure.Controllers
                 {
                     DishId = dish.Id,
                     Quantity = Quantities[i],
-                    Dish = dish           
+                    Dish = dish
                 });
             }
 
-           
+
             order.Sum = order.DishOrders
                 .Sum(d => (d.Dish.Price ?? 0) * d.Quantity);
 
@@ -76,7 +76,7 @@ namespace RestaurantInfrastructure.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -90,7 +90,7 @@ namespace RestaurantInfrastructure.Controllers
             return order == null ? NotFound() : View(order);
         }
 
-        
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -102,7 +102,7 @@ namespace RestaurantInfrastructure.Controllers
             return View(order);
         }
 
-        
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Order order)
         {
@@ -120,7 +120,7 @@ namespace RestaurantInfrastructure.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -145,7 +145,7 @@ namespace RestaurantInfrastructure.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        
+
         private int GenerateNewOrderId() =>
             _context.Orders.Any() ? _context.Orders.Max(o => o.Id) + 1 : 1;
     }

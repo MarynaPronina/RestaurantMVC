@@ -22,22 +22,6 @@ namespace RestaurantInfrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("RestaurantDomain.Model.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Category", (string)null);
-                });
-
             modelBuilder.Entity("RestaurantDomain.Model.Client", b =>
                 {
                     b.Property<int>("Id")
@@ -83,32 +67,14 @@ namespace RestaurantInfrastructure.Migrations
                     b.ToTable("DIsh", (string)null);
                 });
 
-            modelBuilder.Entity("RestaurantDomain.Model.DishCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DishId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("DishId");
-
-                    b.ToTable("DishCategory", (string)null);
-                });
-
             modelBuilder.Entity("RestaurantDomain.Model.DishOrder", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("DishId")
                         .HasColumnType("int");
@@ -210,25 +176,6 @@ namespace RestaurantInfrastructure.Migrations
                     b.ToTable("Worker", (string)null);
                 });
 
-            modelBuilder.Entity("RestaurantDomain.Model.DishCategory", b =>
-                {
-                    b.HasOne("RestaurantDomain.Model.Category", "Category")
-                        .WithMany("DishCategories")
-                        .HasForeignKey("CategoryId")
-                        .IsRequired()
-                        .HasConstraintName("FK_DishCategory_Category");
-
-                    b.HasOne("RestaurantDomain.Model.Dish", "Dish")
-                        .WithMany("DishCategories")
-                        .HasForeignKey("DishId")
-                        .IsRequired()
-                        .HasConstraintName("FK_DishCategory_DIsh");
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Dish");
-                });
-
             modelBuilder.Entity("RestaurantDomain.Model.DishOrder", b =>
                 {
                     b.HasOne("RestaurantDomain.Model.Dish", "Dish")
@@ -278,11 +225,6 @@ namespace RestaurantInfrastructure.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("RestaurantDomain.Model.Category", b =>
-                {
-                    b.Navigation("DishCategories");
-                });
-
             modelBuilder.Entity("RestaurantDomain.Model.Client", b =>
                 {
                     b.Navigation("Orders");
@@ -292,8 +234,6 @@ namespace RestaurantInfrastructure.Migrations
 
             modelBuilder.Entity("RestaurantDomain.Model.Dish", b =>
                 {
-                    b.Navigation("DishCategories");
-
                     b.Navigation("DishOrders");
                 });
 

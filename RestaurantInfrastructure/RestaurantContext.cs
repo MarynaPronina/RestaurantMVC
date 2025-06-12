@@ -1,173 +1,114 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace RestaurantDomain.Model;
 
 public partial class RestaurantContext : DbContext
 {
-    public RestaurantContext()
-    {
-    }
+    public RestaurantContext() { }
 
     public RestaurantContext(DbContextOptions<RestaurantContext> options)
-        : base(options)
-    {
-    }
+        : base(options) { }
 
-    public virtual DbSet<Category> Categories { get; set; }
-    public virtual DbSet<Client> Clients { get; set; }
-    public virtual DbSet<Dish> Dishes { get; set; }
-    public virtual DbSet<DishCategory> DishCategories { get; set; }
-    public virtual DbSet<DishOrder> DishOrders { get; set; }
-    public virtual DbSet<Order> Orders { get; set; }
-    public virtual DbSet<Table> Tables { get; set; }
-    public virtual DbSet<Worker> Workers { get; set; }
+    public virtual DbSet<Client> Clients { get; set; } = null!;
+    public virtual DbSet<Dish> Dishes { get; set; } = null!;
+    public virtual DbSet<DishOrder> DishOrders { get; set; } = null!;
+    public virtual DbSet<Order> Orders { get; set; } = null!;
+    public virtual DbSet<Table> Tables { get; set; } = null!;
+    public virtual DbSet<Worker> Workers { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code.
-        => optionsBuilder.UseSqlServer("Server=Victus\\SQLEXPRESS; Database=restaurant;Trusted_Connection=True; TrustServerCertificate=True; ");
+#warning Move connection string out of source code
+        => optionsBuilder.UseSqlServer(
+            "Server=Victus\\SQLEXPRESS;Database=restaurant;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Category>(entity =>
+        /* ---------- Client ---------- */
+        modelBuilder.Entity<Client>(e =>
         {
-            entity.ToTable("Category");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Name)
-                .HasMaxLength(200)
-                .IsUnicode(false);
+            e.ToTable("Client");
+            e.Property(p => p.Id).ValueGeneratedNever();
+            e.Property(p => p.FirstName).HasMaxLength(200).IsUnicode(false);
+            e.Property(p => p.LastName).HasMaxLength(200).IsUnicode(false);
         });
 
-        modelBuilder.Entity<Client>(entity =>
+        /* ---------- Dish ---------- */
+        modelBuilder.Entity<Dish>(e =>
         {
-            entity.ToTable("Client");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.FirstName)
-                .HasMaxLength(200)
-                .IsUnicode(false);
-            entity.Property(e => e.LastName)
-                .HasMaxLength(200)
-                .IsUnicode(false);
+            e.ToTable("DIsh");
+            e.Property(p => p.Id).ValueGeneratedNever().HasColumnName("id");
+            e.Property(p => p.Name).HasMaxLength(200).IsUnicode(false);
+            e.Property(p => p.Price).HasColumnType("money");
         });
 
-        modelBuilder.Entity<Dish>(entity =>
+        /* ---------- DishOrder ---------- */
+        modelBuilder.Entity<DishOrder>(e =>
         {
-            entity.ToTable("DIsh");
+            e.ToTable("DishOrder");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
+            e.Property(p => p.Id)              // ⬅️  IDENTITY(1,1)
+                .ValueGeneratedOnAdd()
                 .HasColumnName("id");
 
-            entity.Property(e => e.Name)
-                .HasMaxLength(200)
-                .IsUnicode(false);
-            entity.Property(e => e.Price).HasColumnType("money");
-        });
+            e.Property(p => p.Quantity).IsRequired();
 
-        modelBuilder.Entity<DishCategory>(entity =>
-        {
-            entity.ToTable("DishCategory");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-
-            entity.HasOne(d => d.Category).WithMany(p => p.DishCategories)
-                .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_DishCategory_Category");
-
-            entity.HasOne(d => d.Dish).WithMany(p => p.DishCategories)
-                .HasForeignKey(d => d.DishId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_DishCategory_DIsh");
-        });
-
-        modelBuilder.Entity<DishOrder>(entity =>
-        {
-            entity.ToTable("DishOrder");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-
-            entity.Property(e => e.Quantity)
-                .IsRequired(); // 🔧 Обовʼязкове поле — якщо воно є в моделі
-
-            entity.HasOne(d => d.Dish).WithMany(p => p.DishOrders)
+            e.HasOne(d => d.Dish)
+                .WithMany(p => p.DishOrders)
                 .HasForeignKey(d => d.DishId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_DishOrder_DIsh");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.DishOrders)
+            e.HasOne(d => d.Order)
+                .WithMany(p => p.DishOrders)
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_DishOrder_Order");
         });
 
-        modelBuilder.Entity<Order>(entity =>
+        /* ---------- Order ---------- */
+        modelBuilder.Entity<Order>(e =>
         {
-            entity.ToTable("Order");
+            e.ToTable("Order");
+            e.Property(p => p.Id).ValueGeneratedNever().HasColumnName("id");
+            e.Property(p => p.DateTime).HasColumnType("datetime");
+            e.Property(p => p.Sum).HasColumnType("money");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.DateTime).HasColumnType("datetime");
-            entity.Property(e => e.Sum).HasColumnType("money");
-
-            entity.HasOne(d => d.Client).WithMany(p => p.Orders)
+            e.HasOne(d => d.Client)
+                .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ClientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Order_Client");
 
-            entity.HasOne(d => d.Table).WithMany(p => p.Orders)
+            e.HasOne(d => d.Table)
+                .WithMany(p => p.Orders)
                 .HasForeignKey(d => d.TableId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Order_Tables");
         });
 
-        modelBuilder.Entity<Table>(entity =>
+        /* ---------- Table ---------- */
+        modelBuilder.Entity<Table>(e =>
         {
-            entity.ToTable("Tables");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-
-            entity.Property(e => e.Number);
+            e.ToTable("Tables");
+            e.Property(p => p.Id).ValueGeneratedNever().HasColumnName("id");
+            e.Property(p => p.Number);
         });
 
-        modelBuilder.Entity<Worker>(entity =>
+        /* ---------- Worker ---------- */
+        modelBuilder.Entity<Worker>(e =>
         {
-            entity.ToTable("Worker");
+            e.ToTable("Worker");
+            e.Property(p => p.Id).ValueGeneratedNever().HasColumnName("id");
+            e.Property(p => p.FirstName).HasMaxLength(200).IsUnicode(false);
+            e.Property(p => p.LastName).HasMaxLength(200).IsUnicode(false);
+            e.Property(p => p.CityName).HasMaxLength(200).IsUnicode(false);
+            e.Property(p => p.StreetName).HasMaxLength(200).IsUnicode(false);
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CityName)
-                .HasMaxLength(200)
-                .IsUnicode(false);
-            entity.Property(e => e.FirstName)
-                .HasMaxLength(200)
-                .IsUnicode(false);
-            entity.Property(e => e.LastName)
-                .HasMaxLength(200)
-                .IsUnicode(false);
-            entity.Property(e => e.StreetName)
-                .HasMaxLength(200)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Client).WithMany(p => p.Workers)
+            e.HasOne(d => d.Client)
+                .WithMany(p => p.Workers)
                 .HasForeignKey(d => d.ClientId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Worker_Client");
         });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

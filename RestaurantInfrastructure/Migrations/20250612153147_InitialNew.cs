@@ -6,23 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RestaurantInfrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialNew : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Category",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "varchar(200)", unicode: false, maxLength: 200, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Category", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Client",
                 columns: table => new
@@ -85,29 +73,6 @@ namespace RestaurantInfrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DishCategory",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    DishId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DishCategory", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_DishCategory_Category",
-                        column: x => x.CategoryId,
-                        principalTable: "Category",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DishCategory_DIsh",
-                        column: x => x.DishId,
-                        principalTable: "DIsh",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Order",
                 columns: table => new
                 {
@@ -136,7 +101,8 @@ namespace RestaurantInfrastructure.Migrations
                 name: "DishOrder",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     DishId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false)
@@ -155,16 +121,6 @@ namespace RestaurantInfrastructure.Migrations
                         principalTable: "Order",
                         principalColumn: "id");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DishCategory_CategoryId",
-                table: "DishCategory",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DishCategory_DishId",
-                table: "DishCategory",
-                column: "DishId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DishOrder_DishId",
@@ -196,16 +152,10 @@ namespace RestaurantInfrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DishCategory");
-
-            migrationBuilder.DropTable(
                 name: "DishOrder");
 
             migrationBuilder.DropTable(
                 name: "Worker");
-
-            migrationBuilder.DropTable(
-                name: "Category");
 
             migrationBuilder.DropTable(
                 name: "DIsh");

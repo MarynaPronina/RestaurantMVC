@@ -2,36 +2,58 @@
 @{
     ViewData["Title"] = "Клієнти";
 }
-<div class="container py-4">
+<div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Список клієнтів</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-person-plus-fill"></i> Додати клієнта
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-people-fill me-2"></i> Список клієнтів
+        </h2>
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-person-plus-fill me-1"></i> Додати клієнта
         </a>
     </div>
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Ім’я</th>
-                <th>Прізвище</th>
-                <th>Телефон</th>
-                <th class="text-end">Дії</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var client in Model)
-            {
-                <tr>
-                    <td>@client.FirstName</td>
-                    <td>@client.LastName</td>
-                    <td>@client.PhoneNumber</td>
-                    <td class="text-end">
-                        <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-sm btn-primary">Редагувати</a>
-                        <a asp-action="Details" asp-route-id="@client.Id" class="btn btn-sm btn-info">Деталі</a>
-                        <a asp-action="Delete" asp-route-id="@client.Id" class="btn btn-sm btn-danger">Видалити</a>
-                    </td>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle"></i> Клієнтів ще не додано.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover shadow-sm">
+            <thead class="table-light">
+                <tr class="align-middle text-center">
+                    <th style="width: 20%">Ім’я</th>
+                    <th style="width: 20%">Прізвище</th>
+                    <th style="width: 25%">Телефон</th>
+                    <th style="width: 35%">Дії</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var client in Model)
+                {
+                    <tr>
+                        <td class="align-middle">@client.FirstName</td>
+                        <td class="align-middle">@client.LastName</td>
+                        <td class="align-middle">📞 @client.PhoneNumber</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@client.Id" class="btn btn-sm btn-info me-1">
+                                <i class="bi bi-info-circle"></i> Деталі
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@client.Id" class="btn btn-sm btn-primary me-1">
+                                <i class="bi bi-pencil"></i> Редагувати
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@client.Id" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Видалити
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -15,11 +15,7 @@ namespace RestaurantInfrastructure.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var dishes = await _context.Dishes
-                .Include(d => d.DishCategories)
-                .ThenInclude(dc => dc.Category)
-                .ToListAsync();
-
+            var dishes = await _context.Dishes.ToListAsync();
             return View(dishes);
         }
 
@@ -28,8 +24,6 @@ namespace RestaurantInfrastructure.Controllers
             if (id == null) return NotFound();
 
             var dish = await _context.Dishes
-                .Include(d => d.DishCategories)
-                .ThenInclude(dc => dc.Category)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             return dish == null ? NotFound() : View(dish);

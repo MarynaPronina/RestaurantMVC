@@ -1,33 +1,63 @@
-﻿@model IEnumerable< RestaurantDomain.Model.Dish>
+﻿@model IEnumerable<RestaurantDomain.Model.Dish>
 @{
     ViewData["Title"] = "Меню";
 }
 
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Меню ресторану</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i> Додати страву
+        <h2 class="fw-bold text-gradient">🍽️ Меню ресторану</h2>
+        <a asp-action="Create" class="btn btn-lg btn-success shadow">
+            <i class="bi bi-plus-circle me-2"></i> Додати нову страву
         </a>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var dish in Model)
-        {
-            <div class="col">
-                <div class="card h-100 shadow border-0">
-                    <div class="card-body">
-                        <h5 class="card-title">@dish.Name</h5>
-                        
-                        <p class="card-text fw-bold">Ціна: <span class="text-success">@dish.Price грн</span></p>
-                    </div>
-                    <div class="card-footer bg-white d-flex justify-content-between">
-                        <a asp-action="Edit" asp-route-id="@dish.Id" class="btn btn-sm btn-outline-primary">Редагувати</a>
-                        <a asp-action="Details" asp-route-id="@dish.Id" class="btn btn-sm btn-outline-info">Деталі</a>
-                        <a asp-action="Delete" asp-route-id="@dish.Id" class="btn btn-sm btn-outline-danger">Видалити</a>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center">
+            <i class="bi bi-emoji-frown"></i> Меню порожнє. Додайте першу страву!
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var dish in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm rounded-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary fw-bold">
+                                <i class="bi bi-egg-fried me-2"></i>@dish.Name
+                            </h5>
+
+                            <p class="card-text">
+                                <i class="bi bi-cash-coin me-1"></i>
+                                <strong>Ціна:</strong> <span class="text-success">@dish.Price?.ToString("0.00") грн</span>
+                            </p>
+
+                            
+                        </div>
+                        <div class="card-footer bg-light d-flex justify-content-between border-top">
+                            <a asp-action="Edit" asp-route-id="@dish.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Редагувати
+                            </a>
+                            <a asp-action="Details" asp-route-id="@dish.Id" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-info-circle"></i> Деталі
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@dish.Id" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Видалити
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
 </div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(to right, #ff6a00, #ee0979);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+</style>
